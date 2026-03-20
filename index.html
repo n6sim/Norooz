@@ -30,7 +30,7 @@
   /* SLIDES CONTAINER */
   #slides {
     width: 100%;
-    height: calc(100vh - 110px);
+    height: calc(100vh - 90px);
     position: relative;
     overflow: hidden;
   }
@@ -41,15 +41,37 @@
     width: 100%; height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
-    padding: 28px 24px 12px;
+    padding: 28px 24px 24px;
     opacity: 0;
     transform: translateY(60px);
     transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1);
     pointer-events: none;
     text-align: center;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .slide.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+
+  .slide.exit {
+    opacity: 0;
+    transform: translateY(-60px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .slide-content {
+    position: relative;
+    z-index: 2;
+    max-width: 700px;
+    width: 100%;
+    margin: auto;
+    padding-bottom: 16px;
   }
 
   .slide.active {
@@ -79,13 +101,10 @@
 
   /* PROGRESS */
   #progress {
-    position: fixed;
-    bottom: 16px;
-    left: 50%;
-    transform: translateX(-50%);
     display: flex;
     gap: 8px;
-    z-index: 100;
+    z-index: 101;
+    align-items: center;
   }
 
   .dot {
@@ -105,18 +124,19 @@
   /* NAV BUTTONS */
   #nav {
     position: fixed;
-    bottom: 36px;
+    bottom: 0;
     left: 0;
     right: 0;
+    height: 90px;
     display: flex;
+    flex-direction: column;
     justify-content: center;
-    gap: 16px;
-    z-index: 100;
     align-items: center;
-    padding: 0 24px;
-    background: linear-gradient(to top, rgba(13,31,23,0.98) 60%, transparent);
-    padding-top: 12px;
-    padding-bottom: 0;
+    gap: 8px;
+    z-index: 100;
+    padding: 8px 24px;
+    background: rgba(13,31,23,0.97);
+    border-top: 1px solid rgba(201,148,42,0.1);
   }
 
   .nav-btn {
@@ -493,14 +513,12 @@
 
   /* RESPONSIVE */
   @media (max-width: 600px) {
-    .slide { padding: 24px 18px 12px; }
     .haft-grid { grid-template-columns: repeat(2, 1fr); }
   }
 
   @media (min-width: 768px) {
-    #slides { height: calc(100vh - 120px); }
-    .slide { padding: 40px 60px 20px; }
-    #nav { padding: 12px 40px 0; }
+    #slides { height: calc(100vh - 90px); }
+    .slide { padding: 40px 60px 24px; }
   }
 </style>
 </head>
@@ -833,13 +851,13 @@
 
 <!-- NAV -->
 <div id="nav">
-  <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)" disabled>← back</button>
-  <span id="slide-counter">1 / 9</span>
-  <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">next →</button>
+  <div style="display:flex;justify-content:center;gap:16px;align-items:center;width:100%">
+    <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)" disabled>← back</button>
+    <span id="slide-counter">1 / 9</span>
+    <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">next →</button>
+  </div>
+  <div id="progress"></div>
 </div>
-
-<!-- PROGRESS DOTS -->
-<div id="progress" id="dots"></div>
 
 <script>
   const totalSlides = 9;
