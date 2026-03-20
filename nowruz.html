@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nowruz — The Oldest New Year on Earth</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9942A;
+    --deep-green: #1A3A2A;
+    --sage: #4A7A5A;
+    --cream: #F5EDD8;
+    --terracotta: #C4622D;
+    --deep-red: #8B1A1A;
+    --sky: #7BAFC4;
+    --night: #0D1F17;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--night);
+    color: var(--cream);
+  }
+
+  /* SLIDES CONTAINER */
+  #slides {
+    width: 100%;
+    height: calc(100vh - 110px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 28px 24px 12px;
+    opacity: 0;
+    transform: translateY(60px);
+    transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1);
+    pointer-events: none;
+    text-align: center;
+    overflow-y: auto;
+  }
+
+  .slide.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+
+  .slide.exit {
+    opacity: 0;
+    transform: translateY(-60px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  /* BACKGROUNDS */
+  .slide-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .slide-content {
+    position: relative;
+    z-index: 2;
+    max-width: 700px;
+  }
+
+  /* PROGRESS */
+  #progress {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 100;
+  }
+
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(245,237,216,0.3);
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .dot.active {
+    background: var(--gold);
+    width: 20px;
+    border-radius: 3px;
+  }
+
+  /* NAV BUTTONS */
+  #nav {
+    position: fixed;
+    bottom: 36px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    z-index: 100;
+    align-items: center;
+    padding: 0 24px;
+    background: linear-gradient(to top, rgba(13,31,23,0.98) 60%, transparent);
+    padding-top: 12px;
+    padding-bottom: 0;
+  }
+
+  .nav-btn {
+    background: rgba(201,148,42,0.15);
+    border: 1px solid rgba(201,148,42,0.4);
+    color: var(--gold);
+    padding: 14px 32px;
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    letter-spacing: 0.05em;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    flex: 1;
+    max-width: 140px;
+  }
+
+  .nav-btn:hover {
+    background: rgba(201,148,42,0.3);
+    border-color: var(--gold);
+  }
+
+  .nav-btn:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+  }
+
+  #slide-counter {
+    color: rgba(245,237,216,0.4);
+    font-size: 12px;
+    min-width: 40px;
+    text-align: center;
+  }
+
+  /* TYPOGRAPHY */
+  .tag {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+    opacity: 0.8;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1.1;
+    margin-bottom: 24px;
+    font-weight: 900;
+  }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    line-height: 1.2;
+    margin-bottom: 20px;
+    font-weight: 700;
+  }
+
+  .body-text {
+    font-size: clamp(1rem, 2vw, 1.15rem);
+    line-height: 1.8;
+    color: rgba(245,237,216,0.85);
+    font-weight: 300;
+  }
+
+  .body-text strong {
+    color: var(--cream);
+    font-weight: 500;
+  }
+
+  .highlight {
+    color: var(--gold);
+    font-style: italic;
+    font-family: 'Playfair Display', serif;
+  }
+
+  .persian-text {
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    letter-spacing: 0.05em;
+    color: var(--gold);
+    margin: 16px 0;
+    direction: rtl;
+  }
+
+  .emoji-big {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  /* HAFT SEEN GRID */
+  .haft-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-top: 24px;
+    width: 100%;
+    max-width: 650px;
+  }
+
+  .haft-item {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(201,148,42,0.2);
+    border-radius: 12px;
+    padding: 14px 16px;
+    text-align: left;
+    transition: all 0.3s;
+  }
+
+  .haft-item:hover {
+    background: rgba(201,148,42,0.1);
+    border-color: rgba(201,148,42,0.5);
+    transform: translateY(-2px);
+  }
+
+  .haft-item .item-emoji { font-size: 1.4rem; }
+  .haft-item .item-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    color: var(--gold);
+    margin: 4px 0 2px;
+  }
+  .haft-item .item-meaning {
+    font-size: 0.75rem;
+    color: rgba(245,237,216,0.6);
+    font-weight: 300;
+  }
+
+  /* SLIDE 1 — WELCOME */
+  #s1 { background: var(--night); }
+  #s1 .slide-bg {
+    background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(74,122,90,0.3) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 40% at 80% 20%, rgba(201,148,42,0.15) 0%, transparent 60%);
+  }
+
+  /* SLIDE 2 — WHEN */
+  #s2 { background: #0A1A28; }
+  #s2 .slide-bg {
+    background: radial-gradient(ellipse 100% 80% at 50% 110%, rgba(123,175,196,0.2) 0%, transparent 60%),
+                radial-gradient(ellipse 40% 30% at 20% 20%, rgba(201,148,42,0.1) 0%, transparent 50%);
+  }
+
+  /* SLIDE 3 — WHAT WE DO */
+  #s3 { background: #1A2A1A; }
+  #s3 .slide-bg {
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(74,122,90,0.4) 0%, transparent 60%);
+  }
+
+  /* SLIDE 4 — HAFT SEEN */
+  #s4 { background: #1F1508; }
+  #s4 .slide-bg {
+    background: radial-gradient(ellipse 80% 50% at 50% 100%, rgba(201,148,42,0.2) 0%, transparent 60%);
+  }
+
+  /* SLIDE 5 — COMMUNITY */
+  #s5 { background: #1A0F0F; }
+  #s5 .slide-bg {
+    background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(196,98,45,0.15) 0%, transparent 60%);
+  }
+
+  /* SLIDE 6 — KHAYYAM */
+  #s6 { background: #0F1520; }
+  #s6 .slide-bg {
+    background: radial-gradient(ellipse 60% 60% at 70% 30%, rgba(123,175,196,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse 40% 40% at 20% 80%, rgba(201,148,42,0.1) 0%, transparent 50%);
+  }
+
+  /* SLIDE 7 — 13 DAYS */
+  #s7 { background: #0D1F17; }
+  #s7 .slide-bg {
+    background: radial-gradient(ellipse 100% 60% at 50% 100%, rgba(26,58,42,0.8) 0%, transparent 60%);
+  }
+
+  /* SLIDE 8 — CULTURE */
+  #s8 { background: #1A0A0A; }
+  #s8 .slide-bg {
+    background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(139,26,26,0.3) 0%, transparent 60%);
+  }
+
+  /* SLIDE 9 — INVITE */
+  #s9 { background: #0D1F17; }
+  #s9 .slide-bg {
+    background: radial-gradient(ellipse 80% 80% at 50% 80%, rgba(74,122,90,0.35) 0%, transparent 60%),
+                radial-gradient(ellipse 40% 30% at 80% 10%, rgba(201,148,42,0.15) 0%, transparent 50%);
+  }
+
+  /* SVG DECORATIONS */
+  .deco-svg {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* EQUINOX VISUAL */
+  .equinox-visual {
+    position: relative;
+    width: 200px; height: 200px;
+    margin: 0 auto 24px;
+  }
+
+  .equinox-visual svg {
+    width: 100%; height: 100%;
+    animation: slowspin 30s linear infinite;
+  }
+
+  @keyframes slowspin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .time-display {
+    background: rgba(123,175,196,0.1);
+    border: 1px solid rgba(123,175,196,0.3);
+    border-radius: 16px;
+    padding: 20px 32px;
+    margin: 20px auto;
+    display: inline-block;
+  }
+
+  .time-display .time-big {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: var(--sky);
+    display: block;
+  }
+
+  .time-display .time-label {
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(123,175,196,0.6);
+    display: block;
+    margin-top: 4px;
+  }
+
+  /* FLOWERS */
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    33% { transform: translateY(-12px) rotate(3deg); }
+    66% { transform: translateY(-6px) rotate(-2deg); }
+  }
+
+  .float { animation: float 6s ease-in-out infinite; }
+  .float-delay { animation: float 8s ease-in-out 2s infinite; }
+
+  /* COUNTDOWN */
+  .countdown-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin: 20px 0;
+  }
+
+  .countdown-box {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(201,148,42,0.2);
+    border-radius: 12px;
+    padding: 16px 20px;
+    min-width: 70px;
+  }
+
+  .countdown-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--gold);
+    display: block;
+    line-height: 1;
+  }
+
+  .countdown-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(245,237,216,0.4);
+    display: block;
+    margin-top: 4px;
+  }
+
+  /* FIRE ANIMATION */
+  @keyframes flicker {
+    0%, 100% { transform: scaleY(1) scaleX(1); }
+    25% { transform: scaleY(1.05) scaleX(0.97); }
+    50% { transform: scaleY(0.97) scaleX(1.03); }
+    75% { transform: scaleY(1.03) scaleX(0.98); }
+  }
+
+  .fire-icon {
+    display: inline-block;
+    animation: flicker 1.5s ease-in-out infinite;
+    transform-origin: bottom center;
+  }
+
+  /* QUOTE BOX */
+  .quote-box {
+    background: rgba(255,255,255,0.04);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 12px 12px 0;
+    padding: 20px 24px;
+    margin: 20px 0;
+    text-align: left;
+  }
+
+  .quote-box .quote-text {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--cream);
+    line-height: 1.6;
+  }
+
+  .quote-box .quote-attr {
+    font-size: 0.8rem;
+    color: var(--gold);
+    margin-top: 8px;
+    letter-spacing: 0.05em;
+  }
+
+  /* STARS BG */
+  .stars {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle 3s ease-in-out infinite;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  /* FINAL SLIDE */
+  .mobarak {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 7vw, 5rem);
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--gold), #E8C86A, var(--terracotta));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    line-height: 1.1;
+  }
+
+  .mobarak-persian {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.2rem, 3vw, 1.8rem);
+    color: rgba(201,148,42,0.7);
+    margin-bottom: 24px;
+    direction: rtl;
+  }
+
+  /* GRAIN overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.4;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .slide { padding: 24px 18px 12px; }
+    .haft-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (min-width: 768px) {
+    #slides { height: calc(100vh - 120px); }
+    .slide { padding: 40px 60px 20px; }
+    #nav { padding: 12px 40px 0; }
+  }
+</style>
+</head>
+<body>
+
+<div id="slides">
+
+  <!-- SLIDE 1: WELCOME -->
+  <div class="slide active" id="s1">
+    <div class="slide-bg"></div>
+    <!-- Decorative petals -->
+    <svg class="deco-svg float" style="top:10%;right:8%;width:80px;opacity:0.4" viewBox="0 0 100 100">
+      <g fill="none">
+        <ellipse cx="50" cy="30" rx="12" ry="25" fill="#C9942A" opacity="0.6" transform="rotate(0 50 50)"/>
+        <ellipse cx="50" cy="30" rx="12" ry="25" fill="#C9942A" opacity="0.6" transform="rotate(60 50 50)"/>
+        <ellipse cx="50" cy="30" rx="12" ry="25" fill="#C9942A" opacity="0.6" transform="rotate(120 50 50)"/>
+        <ellipse cx="50" cy="30" rx="12" ry="25" fill="#C4622D" opacity="0.5" transform="rotate(180 50 50)"/>
+        <ellipse cx="50" cy="30" rx="12" ry="25" fill="#C4622D" opacity="0.5" transform="rotate(240 50 50)"/>
+        <ellipse cx="50" cy="30" rx="12" ry="25" fill="#C4622D" opacity="0.5" transform="rotate(300 50 50)"/>
+        <circle cx="50" cy="50" r="8" fill="#F5EDD8"/>
+      </g>
+    </svg>
+    <svg class="deco-svg float-delay" style="bottom:20%;left:6%;width:60px;opacity:0.3" viewBox="0 0 100 100">
+      <g fill="none">
+        <ellipse cx="50" cy="30" rx="10" ry="22" fill="#4A7A5A" opacity="0.7" transform="rotate(0 50 50)"/>
+        <ellipse cx="50" cy="30" rx="10" ry="22" fill="#4A7A5A" opacity="0.7" transform="rotate(72 50 50)"/>
+        <ellipse cx="50" cy="30" rx="10" ry="22" fill="#4A7A5A" opacity="0.7" transform="rotate(144 50 50)"/>
+        <ellipse cx="50" cy="30" rx="10" ry="22" fill="#4A7A5A" opacity="0.7" transform="rotate(216 50 50)"/>
+        <ellipse cx="50" cy="30" rx="10" ry="22" fill="#4A7A5A" opacity="0.7" transform="rotate(288 50 50)"/>
+        <circle cx="50" cy="50" r="7" fill="#C9942A"/>
+      </g>
+    </svg>
+
+    <div class="slide-content">
+      <div class="tag">نوروز — Nowruz</div>
+      <h1>hey, you made it here. <span class="highlight">good.</span> 🌱</h1>
+      <p class="body-text">
+        so there's a new year happening <strong>this Friday, March 20th.</strong><br>
+        not a calendar someone made up in a meeting room.<br>
+        the actual moment the universe flips the switch.<br><br>
+        the spring equinox. day and night, perfectly equal.<br>
+        nature's reset button.<br><br>
+        humans noticed this <strong>3,000 years ago</strong> and said —<br>
+        <em>yeah, this is it. this is the new year.</em><br><br>
+        and honestly? they were right.
+      </p>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: WHEN -->
+  <div class="slide" id="s2">
+    <div class="slide-bg"></div>
+    <div class="stars" id="stars"></div>
+
+    <div class="slide-content">
+      <div class="tag">the moment</div>
+      <h2>when exactly tho 📅</h2>
+
+      <div class="equinox-visual">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(201,148,42,0.2)" stroke-width="1"/>
+          <circle cx="100" cy="100" r="70" fill="none" stroke="rgba(123,175,196,0.15)" stroke-width="1" stroke-dasharray="4 4"/>
+          <!-- Sun -->
+          <circle cx="100" cy="100" r="22" fill="#C9942A" opacity="0.9"/>
+          <circle cx="100" cy="100" r="16" fill="#E8C86A"/>
+          <!-- Orbit dot (Earth) -->
+          <circle cx="100" cy="12" r="8" fill="#7BAFC4"/>
+          <circle cx="100" cy="12" r="4" fill="#4A7A5A"/>
+          <!-- Equinox line -->
+          <line x1="10" y1="100" x2="190" y2="100" stroke="rgba(201,148,42,0.3)" stroke-width="1" stroke-dasharray="6 3"/>
+          <!-- Small stars -->
+          <circle cx="30" cy="30" r="1.5" fill="white" opacity="0.6"/>
+          <circle cx="170" cy="45" r="1" fill="white" opacity="0.4"/>
+          <circle cx="155" cy="160" r="1.5" fill="white" opacity="0.5"/>
+          <circle cx="40" cy="165" r="1" fill="white" opacity="0.4"/>
+          <circle cx="180" cy="130" r="2" fill="white" opacity="0.3"/>
+          <circle cx="20" cy="120" r="1" fill="white" opacity="0.5"/>
+        </svg>
+      </div>
+
+      <div class="time-display">
+        <span class="time-big">10:45:59 AM</span>
+        <span class="time-label">Friday, March 20th 2026 · Eastern Time</span>
+      </div>
+
+      <p class="body-text">
+        not "around spring." not "sometime in March."<br>
+        the <strong>exact second</strong> the sun crosses the equator.<br>
+        Iranians have been tracking this moment for thousands of years.<br>
+        your calendar app could never.
+      </p>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: WHAT WE DO -->
+  <div class="slide" id="s3">
+    <div class="slide-bg"></div>
+    <svg class="deco-svg" style="top:0;right:0;width:300px;opacity:0.07" viewBox="0 0 300 300">
+      <path d="M150 0 Q200 50 300 50 Q250 150 300 300 Q200 250 150 300 Q100 250 0 300 Q50 150 0 50 Q100 50 150 0Z" fill="#4A7A5A"/>
+    </svg>
+
+    <div class="slide-content">
+      <div class="tag">the ritual</div>
+      <h2>okay but what do we actually do 🌿</h2>
+      <p class="body-text">
+        first we clean <strong>everything.</strong> like everything.<br>
+        we call it <span class="highlight">khane tekani.</span><br>
+        shake the dust of the whole year out.<br>
+        new year, clean slate. literally.<br><br>
+        then we put on new clothes.<br>
+        because you're not bringing last year's energy<br>
+        into this one.<br><br>
+        then we set the table. 🌿<br>
+        and that table? it's a whole thing.
+      </p>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: HAFT SEEN -->
+  <div class="slide" id="s4">
+    <div class="slide-bg"></div>
+
+    <div class="slide-content" style="max-width:750px">
+      <div class="tag">the table</div>
+      <h2>the Haft-Seen table ✨</h2>
+      <p class="body-text" style="margin-bottom:8px">
+        seven items. all starting with <strong>S</strong> in Persian.<br>
+        not decoration. <span class="highlight">intention.</span> every item is a prayer without words.
+      </p>
+
+      <div class="haft-grid">
+        <div class="haft-item">
+          <span class="item-emoji">🌱</span>
+          <div class="item-name">Sabzeh</div>
+          <div class="item-meaning">sprouts · renewal & new life</div>
+        </div>
+        <div class="haft-item">
+          <span class="item-emoji">🍮</span>
+          <div class="item-name">Samanu</div>
+          <div class="item-meaning">wheat pudding · abundance</div>
+        </div>
+        <div class="haft-item">
+          <span class="item-emoji">🫒</span>
+          <div class="item-name">Senjed</div>
+          <div class="item-meaning">dried fruit · love</div>
+        </div>
+        <div class="haft-item">
+          <span class="item-emoji">🧄</span>
+          <div class="item-name">Seer</div>
+          <div class="item-meaning">garlic · health & protection</div>
+        </div>
+        <div class="haft-item">
+          <span class="item-emoji">🍎</span>
+          <div class="item-name">Seeb</div>
+          <div class="item-meaning">apple · beauty</div>
+        </div>
+        <div class="haft-item">
+          <span class="item-emoji">🍶</span>
+          <div class="item-name">Serkeh</div>
+          <div class="item-meaning">vinegar · patience & wisdom</div>
+        </div>
+        <div class="haft-item" style="grid-column: span 2">
+          <span class="item-emoji">🌸</span>
+          <div class="item-name">Sumac</div>
+          <div class="item-meaning">sunrise · light winning over darkness</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: COMMUNITY -->
+  <div class="slide" id="s5">
+    <div class="slide-bg"></div>
+
+    <div class="slide-content">
+      <div class="tag">the people</div>
+      <h2>then we show up for each other 💚</h2>
+      <p class="body-text">
+        we visit family. starting with the elders.<br>
+        we reconcile. had beef with someone this year?<br>
+        <strong>Nowruz is when you fix it.</strong><br>
+        no grudges allowed into the new year.<br><br>
+        and we give <span class="highlight">Eydi.</span><br>
+        gifts, usually money, from elders to the young.<br>
+        a blessing passed hand to hand.<br>
+        basically the Persian version of<br>
+        <em>"here, start fresh."</em><br><br>
+        it's not just a holiday.<br>
+        it's a reminder that the people around you<br>
+        <strong>are the whole point.</strong>
+      </p>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: KHAYYAM -->
+  <div class="slide" id="s6">
+    <div class="slide-bg"></div>
+    <svg class="deco-svg float-delay" style="top:15%;right:5%;width:100px;opacity:0.15" viewBox="0 0 100 100">
+      <path d="M50 5 L61 35 L95 35 L68 57 L79 91 L50 70 L21 91 L32 57 L5 35 L39 35 Z" fill="#C9942A"/>
+    </svg>
+
+    <div class="slide-content">
+      <div class="tag">the legend</div>
+      <h2>the guy who made it all make sense 🌹</h2>
+
+      <div class="quote-box">
+        <div class="quote-text">"the renewal of the world"</div>
+        <div class="quote-attr">— Omar Khayyam, describing Nowruz, 11th century</div>
+      </div>
+
+      <p class="body-text">
+        meet <strong>Omar Khayyam.</strong><br>
+        11th century Persian poet, mathematician, astronomer.<br>
+        yes, all three. the original multi-hyphenate.<br><br>
+        he reformed the Iranian calendar to lock Nowruz<br>
+        to the <strong>exact moment of the equinox.</strong><br>
+        so accurate it helped shape the Gregorian calendar<br>
+        you use today.<br><br>
+        same guy wrote poetry about wine, roses,<br>
+        and the meaning of life.<br>
+        a whole legend.
+      </p>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: 13 DAYS -->
+  <div class="slide" id="s7">
+    <div class="slide-bg"></div>
+    <svg class="deco-svg" style="bottom:10%;right:5%;width:120px;opacity:0.15" viewBox="0 0 120 120">
+      <circle cx="60" cy="60" r="55" fill="none" stroke="#4A7A5A" stroke-width="2"/>
+      <text x="60" y="68" font-size="36" text-anchor="middle" fill="#4A7A5A" font-family="serif">13</text>
+    </svg>
+
+    <div class="slide-content">
+      <div class="tag">the celebration</div>
+      <h2>13 days. then nature. 🌍</h2>
+      <p class="body-text">
+        Nowruz is not one day. it's <strong>13 days</strong> of celebration.<br>
+        visiting, eating, laughing, just existing together.<br><br>
+        on the 13th day, <span class="highlight">Sizdah Bedar,</span><br>
+        nobody stays inside.<br>
+        everyone goes out. parks, rivers, fields, wherever.<br>
+        spend the whole day in nature.<br>
+        breathe it in. let go of whatever you're still carrying.<br><br>
+        Iranians built a <strong>national holiday</strong><br>
+        around going outside and being grateful.<br>
+        3,000 years ago.<br><br>
+        we been knew. 🌿
+      </p>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: CULTURE -->
+  <div class="slide" id="s8">
+    <div class="slide-bg"></div>
+
+    <div class="slide-content">
+      <div class="tag">the culture</div>
+      <h2>what Persian culture is actually about <span class="fire-icon">🔥</span></h2>
+
+      <p class="body-text">
+        people think they know Iran.<br>
+        they've seen the news.<br><br>
+        but here's what doesn't make the headlines:<br><br>
+        a civilization that built its whole ethics<br>
+        around three words.<br>
+        from <strong>Zoroastrianism,</strong> thousands of years<br>
+        before anything you learned in school:
+      </p>
+
+      <div class="persian-text">پندار نیک &nbsp;·&nbsp; گفتار نیک &nbsp;·&nbsp; کردار نیک</div>
+
+      <p class="body-text">
+        <strong>good thoughts. good words. good deeds.</strong><br>
+        that's literally it.<br><br>
+        the mullahs tried to erase it.<br>
+        it didn't work. it never has.<br>
+        Nowruz survived every empire, every conquest, every ban.<br>
+        this year, as Iranians fight for their freedom —<br>
+        it means <strong>everything.</strong>
+      </p>
+    </div>
+  </div>
+
+  <!-- SLIDE 9: INVITE -->
+  <div class="slide" id="s9">
+    <div class="slide-bg"></div>
+    <svg class="deco-svg float" style="top:8%;left:5%;width:90px;opacity:0.35" viewBox="0 0 100 100">
+      <g fill="none">
+        <ellipse cx="50" cy="28" rx="11" ry="23" fill="#4A7A5A" opacity="0.8" transform="rotate(0 50 50)"/>
+        <ellipse cx="50" cy="28" rx="11" ry="23" fill="#C9942A" opacity="0.7" transform="rotate(60 50 50)"/>
+        <ellipse cx="50" cy="28" rx="11" ry="23" fill="#4A7A5A" opacity="0.8" transform="rotate(120 50 50)"/>
+        <ellipse cx="50" cy="28" rx="11" ry="23" fill="#C9942A" opacity="0.7" transform="rotate(180 50 50)"/>
+        <ellipse cx="50" cy="28" rx="11" ry="23" fill="#4A7A5A" opacity="0.8" transform="rotate(240 50 50)"/>
+        <ellipse cx="50" cy="28" rx="11" ry="23" fill="#C9942A" opacity="0.7" transform="rotate(300 50 50)"/>
+        <circle cx="50" cy="50" r="9" fill="#F5EDD8"/>
+      </g>
+    </svg>
+    <svg class="deco-svg float-delay" style="bottom:15%;right:4%;width:70px;opacity:0.3" viewBox="0 0 100 100">
+      <g fill="none">
+        <ellipse cx="50" cy="28" rx="11" ry="23" fill="#C4622D" opacity="0.8" transform="rotate(0 50 50)"/>
+        <ellipse cx="50" cy="28" rx="11" ry="23" fill="#C4622D" opacity="0.8" transform="rotate(72 50 50)"/>
+        <ellipse cx="50" cy="28" rx="11" ry="23" fill="#C4622D" opacity="0.8" transform="rotate(144 50 50)"/>
+        <ellipse cx="50" cy="28" rx="11" ry="23" fill="#C4622D" opacity="0.8" transform="rotate(216 50 50)"/>
+        <ellipse cx="50" cy="28" rx="11" ry="23" fill="#C4622D" opacity="0.8" transform="rotate(288 50 50)"/>
+        <circle cx="50" cy="50" r="8" fill="#F5EDD8"/>
+      </g>
+    </svg>
+
+    <div class="slide-content">
+      <div class="mobarak">Nowruz Mobarak</div>
+      <div class="mobarak-persian">نوروز مبارک</div>
+
+      <p class="body-text">
+        you don't have to be Iranian to celebrate this.<br>
+        Nowruz means <span class="highlight">new day.</span><br>
+        and a new day belongs to everyone.<br><br>
+        so this Friday, go outside.<br>
+        notice that day and night are equal.<br>
+        eat some incredible Persian food.<br>
+        call that friend you keep meaning to call.<br><br>
+        and if you know any Iranians —<br>
+        tell them <strong>Nowruz Mobarak.</strong> happy new year.<br><br>
+        you can say it for days after. we love that. 🌱
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<!-- NAV -->
+<div id="nav">
+  <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)" disabled>← back</button>
+  <span id="slide-counter">1 / 9</span>
+  <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">next →</button>
+</div>
+
+<!-- PROGRESS DOTS -->
+<div id="progress" id="dots"></div>
+
+<script>
+  const totalSlides = 9;
+  let current = 0;
+  let isAnimating = false;
+
+  // Build dots
+  const progressEl = document.getElementById('progress');
+  for (let i = 0; i < totalSlides; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dot.onclick = () => goToSlide(i);
+    progressEl.appendChild(dot);
+  }
+
+  // Build stars for slide 2
+  const starsEl = document.getElementById('stars');
+  if (starsEl) {
+    for (let i = 0; i < 60; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      const size = Math.random() * 2 + 1;
+      star.style.cssText = `
+        width: ${size}px; height: ${size}px;
+        top: ${Math.random() * 100}%;
+        left: ${Math.random() * 100}%;
+        animation-delay: ${Math.random() * 3}s;
+        animation-duration: ${2 + Math.random() * 3}s;
+      `;
+      starsEl.appendChild(star);
+    }
+  }
+
+  function goToSlide(index) {
+    if (isAnimating || index === current) return;
+    isAnimating = true;
+
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.dot');
+
+    slides[current].classList.add('exit');
+    slides[current].classList.remove('active');
+
+    setTimeout(() => {
+      slides[current].classList.remove('exit');
+      current = index;
+      slides[current].classList.add('active');
+
+      dots.forEach((d, i) => d.classList.toggle('active', i === current));
+      document.getElementById('slide-counter').textContent = `${current + 1} / ${totalSlides}`;
+      document.getElementById('prevBtn').disabled = current === 0;
+      document.getElementById('nextBtn').disabled = current === totalSlides - 1;
+
+      setTimeout(() => { isAnimating = false; }, 700);
+    }, 300);
+  }
+
+  function changeSlide(dir) {
+    const next = current + dir;
+    if (next >= 0 && next < totalSlides) goToSlide(next);
+  }
+
+  // Keyboard nav
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changeSlide(1);
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') changeSlide(-1);
+  });
+
+  // Touch/swipe
+  let touchStartX = 0;
+  document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+  document.addEventListener('touchend', (e) => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) changeSlide(diff > 0 ? 1 : -1);
+  });
+</script>
+</body>
+</html>
